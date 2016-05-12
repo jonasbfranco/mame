@@ -2,6 +2,9 @@
 -- copyright-holders:MAMEdev Team
 STANDALONE = false
 
+premake.gcc.platforms["x32"]["cppflags"] = ""
+premake.gcc.platforms["x64"]["cppflags"] = ""
+
 newoption {
 	trigger = 'build-dir',
 	description = 'Build directory name',
@@ -66,11 +69,6 @@ function layoutbuildtask(_folder, _name)
 end
 
 function precompiledheaders()
-	if _OPTIONS["precompile"]==nil or (_OPTIONS["precompile"]~=nil and _OPTIONS["precompile"]=="1") then
-		configuration { "not xcode4" }
-			pchheader("emu.h")
-		configuration { }
-	end
 end
 
 function addprojectflags()
