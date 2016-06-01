@@ -707,7 +707,7 @@ public:
 	// install ports, banks, RAM (with mirror/mask)
 	void install_read_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag) { install_readwrite_port(addrstart, addrend, addrmirror, rtag, nullptr); }
 	void install_write_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *wtag) { install_readwrite_port(addrstart, addrend, addrmirror, nullptr, wtag); }
-	void install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag);
+	virtual void install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag) = 0;
 	void install_read_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *tag) { install_bank_generic(addrstart, addrend, addrmirror, tag, nullptr); }
 	void install_write_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *tag) { install_bank_generic(addrstart, addrend, addrmirror, nullptr, tag); }
 	void install_readwrite_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *tag)  { install_bank_generic(addrstart, addrend, addrmirror, tag, tag); }
@@ -724,11 +724,11 @@ public:
 		install_device_delegate(addrstart, addrend, device, delegate, bits, unitmask);
 	}
 
-	void install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_delegate &map, int bits = 0, UINT64 unitmask = 0);
+	virtual void install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_delegate &map, int bits = 0, UINT64 unitmask = 0) = 0;
 
 	// install setoffset handler
 	void install_setoffset_handler(offs_t addrstart, offs_t addrend, setoffset_delegate sohandler, UINT64 unitmask = 0) { install_setoffset_handler(addrstart, addrend, 0, 0, 0, sohandler, unitmask); }
-	void install_setoffset_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, setoffset_delegate sohandler, UINT64 unitmask = 0);
+	virtual void install_setoffset_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, setoffset_delegate sohandler, UINT64 unitmask = 0) = 0;
 
 	// install new-style delegate handlers (short form)
 	void install_read_handler(offs_t addrstart, offs_t addrend, read8_delegate rhandler, UINT64 unitmask = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask); }
@@ -745,18 +745,18 @@ public:
 	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read64_delegate rhandler, write64_delegate whandler, UINT64 unitmask = 0) { install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask); }
 
 	// install new-style delegate handlers (with mirror/mask)
-	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, UINT64 unitmask = 0);
-	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8_delegate whandler, UINT64 unitmask = 0);
-	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, write8_delegate whandler, UINT64 unitmask = 0);
-	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, UINT64 unitmask = 0);
-	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16_delegate whandler, UINT64 unitmask = 0);
-	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, write16_delegate whandler, UINT64 unitmask = 0);
-	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, UINT64 unitmask = 0);
-	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32_delegate whandler, UINT64 unitmask = 0);
-	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, write32_delegate whandler, UINT64 unitmask = 0);
-	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, UINT64 unitmask = 0);
-	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64_delegate whandler, UINT64 unitmask = 0);
-	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, write64_delegate whandler, UINT64 unitmask = 0);
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, UINT64 unitmask = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8_delegate whandler, UINT64 unitmask = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, write8_delegate whandler, UINT64 unitmask = 0) = 0;
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, UINT64 unitmask = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16_delegate whandler, UINT64 unitmask = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, write16_delegate whandler, UINT64 unitmask = 0) = 0;
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, UINT64 unitmask = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32_delegate whandler, UINT64 unitmask = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, write32_delegate whandler, UINT64 unitmask = 0) = 0;
+	virtual void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, UINT64 unitmask = 0) = 0;
+	virtual void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64_delegate whandler, UINT64 unitmask = 0) = 0;
+	virtual void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, write64_delegate whandler, UINT64 unitmask = 0) = 0;
 
 	// setup
 	void prepare_map();
@@ -767,7 +767,7 @@ public:
 	template<int _width_, int _ashift_> handler_entry_read_unmapped_new <_width_, _ashift_> *get_unmap_r() const { return static_cast<handler_entry_read_unmapped_new <_width_, _ashift_> *>(m_unmap_r); }
 	template<int _width_, int _ashift_> handler_entry_write_unmapped_new<_width_, _ashift_> *get_unmap_w() const { return static_cast<handler_entry_write_unmapped_new<_width_, _ashift_> *>(m_unmap_w); }
 
-private:
+protected:
 	// internal helpers
 	virtual address_table_read &read() = 0;
 	virtual address_table_write &write() = 0;
@@ -776,9 +776,9 @@ private:
 	void populate_map_entry(const address_map_entry &entry, read_or_write readorwrite);
 	void populate_map_entry_setoffset(const address_map_entry &entry);
 	void unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, bool quiet);
-	void install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, void *baseptr);
-	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag);
-	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank);
+	virtual void install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, void *baseptr) = 0;
+	virtual void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag) = 0;
+	virtual void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank) = 0;
 	void adjust_addresses(offs_t &start, offs_t &end, offs_t &mask, offs_t &mirror);
 	void *find_backing_memory(offs_t addrstart, offs_t addrend);
 	bool needs_backing_store(const address_map_entry &entry);
@@ -811,8 +811,6 @@ protected:
 	handler_entry_new       *m_unmap_r;
 	handler_entry_new       *m_unmap_w;
 
-
-private:
 	memory_manager &        m_manager;          // reference to the owning manager
 	running_machine &       m_machine;          // reference to the owning machine
 };
@@ -1050,6 +1048,7 @@ private:
 class memory_manager
 {
 	friend class address_space;
+	template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> friend class address_space_specific;
 
 public:
 	// construction/destruction

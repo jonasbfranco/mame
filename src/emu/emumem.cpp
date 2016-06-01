@@ -1217,6 +1217,26 @@ class address_space_specific : public address_space
 	UINT32 setoffset_lookup(offs_t byteaddress) const { return _Large ? m_setoffset.lookup_live_large(byteaddress) : m_setoffset.lookup_live_small(byteaddress); }
 
 public:
+	void install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, void *baseptr) override;
+	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag) override;
+	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank) override;
+	void install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag) override;
+	void install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_delegate &map, int bits = 0, UINT64 unitmask = 0) override;
+	void install_setoffset_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, setoffset_delegate sohandler, UINT64 unitmask = 0) override;
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, UINT64 unitmask = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8_delegate whandler, UINT64 unitmask = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, write8_delegate whandler, UINT64 unitmask = 0) override;
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, UINT64 unitmask = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16_delegate whandler, UINT64 unitmask = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, write16_delegate whandler, UINT64 unitmask = 0) override;
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, UINT64 unitmask = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32_delegate whandler, UINT64 unitmask = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, write32_delegate whandler, UINT64 unitmask = 0) override;
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, UINT64 unitmask = 0) override;
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64_delegate whandler, UINT64 unitmask = 0) override;
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, write64_delegate whandler, UINT64 unitmask = 0) override;
+
+
 	// construction/destruction
 	address_space_specific(memory_manager &manager, device_memory_interface &memory, address_spacenum spacenum, int address_width)
 		: address_space(manager, memory, spacenum, _Large),
@@ -2867,7 +2887,7 @@ void address_space::unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrm
 //  of a live device into this address space
 //-------------------------------------------------
 
-void address_space::install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_delegate &delegate, int bits, UINT64 unitmask)
+template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_delegate &delegate, int bits, UINT64 unitmask)
 {
 	check_address("install_device_delegate", addrstart, addrend);
 	address_map map(*this, addrstart, addrend, bits, unitmask, device, delegate);
@@ -2882,7 +2902,7 @@ void address_space::install_device_delegate(offs_t addrstart, offs_t addrend, de
 //  handler into this address space
 //-------------------------------------------------
 
-void address_space::install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag)
+template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag)
 {
 	VPRINTF(("address_space::install_readwrite_port(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -2925,7 +2945,7 @@ void address_space::install_readwrite_port(offs_t addrstart, offs_t addrend, off
 //  mapping to a particular bank
 //-------------------------------------------------
 
-void address_space::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag)
+template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag)
 {
 	VPRINTF(("address_space::install_readwrite_bank(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -2956,7 +2976,7 @@ void address_space::install_bank_generic(offs_t addrstart, offs_t addrend, offs_
 }
 
 
-void address_space::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank)
+template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank)
 {
 	VPRINTF(("address_space::install_readwrite_bank(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -2988,7 +3008,7 @@ void address_space::install_bank_generic(offs_t addrstart, offs_t addrend, offs_
 //  RAM region into the given address space
 //-------------------------------------------------
 
-void address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, void *baseptr)
+template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, void *baseptr)
 {
 	VPRINTF(("address_space::install_ram_generic(%s-%s mirror=%s, %s, %p)\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -3064,7 +3084,7 @@ void address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t
 //  delegate handlers for the space
 //-------------------------------------------------
 
-void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate handler, UINT64 unitmask)
+template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate handler, UINT64 unitmask)
 {
 	VPRINTF(("address_space::install_read_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -3078,7 +3098,7 @@ void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_
 	generate_memdump(machine());
 }
 
-void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8_delegate handler, UINT64 unitmask)
+template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8_delegate handler, UINT64 unitmask)
 {
 	VPRINTF(("address_space::install_write_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -3092,7 +3112,7 @@ void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs
 	generate_memdump(machine());
 }
 
-void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, write8_delegate whandler, UINT64 unitmask)
+template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, write8_delegate whandler, UINT64 unitmask)
 {
 	install_read_handler(addrstart, addrend, addrmask, addrmirror, addrselect, rhandler, unitmask);
 	install_write_handler(addrstart, addrend, addrmask, addrmirror, addrselect, whandler, unitmask);
@@ -3104,7 +3124,7 @@ void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, 
 //  delegate handlers for the space
 //-------------------------------------------------
 
-void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate handler, UINT64 unitmask)
+template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate handler, UINT64 unitmask)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_all("install_read_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
@@ -3112,7 +3132,7 @@ void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_
 	generate_memdump(machine());
 }
 
-void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16_delegate handler, UINT64 unitmask)
+template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16_delegate handler, UINT64 unitmask)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_all("install_write_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
@@ -3120,7 +3140,7 @@ void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs
 	generate_memdump(machine());
 }
 
-void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, write16_delegate whandler, UINT64 unitmask)
+template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, write16_delegate whandler, UINT64 unitmask)
 {
 	install_read_handler(addrstart, addrend, addrmask, addrmirror, addrselect, rhandler, unitmask);
 	install_write_handler(addrstart, addrend, addrmask, addrmirror, addrselect, whandler, unitmask);
@@ -3132,7 +3152,7 @@ void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, 
 //  delegate handlers for the space
 //-------------------------------------------------
 
-void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate handler, UINT64 unitmask)
+template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate handler, UINT64 unitmask)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_all("install_read_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
@@ -3140,7 +3160,7 @@ void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_
 	generate_memdump(machine());
 }
 
-void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32_delegate handler, UINT64 unitmask)
+template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32_delegate handler, UINT64 unitmask)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_all("install_write_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
@@ -3148,7 +3168,7 @@ void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs
 	generate_memdump(machine());
 }
 
-void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, write32_delegate whandler, UINT64 unitmask)
+template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, write32_delegate whandler, UINT64 unitmask)
 {
 	install_read_handler(addrstart, addrend, addrmask, addrmirror, addrselect, rhandler, unitmask);
 	install_write_handler(addrstart, addrend, addrmask, addrmirror, addrselect, whandler, unitmask);
@@ -3160,7 +3180,7 @@ void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, 
 //  delegate handlers for the space
 //-------------------------------------------------
 
-void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate handler, UINT64 unitmask)
+template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate handler, UINT64 unitmask)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_all("install_read_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
@@ -3168,7 +3188,7 @@ void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_
 	generate_memdump(machine());
 }
 
-void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64_delegate handler, UINT64 unitmask)
+template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64_delegate handler, UINT64 unitmask)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_all("install_write_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
@@ -3176,7 +3196,7 @@ void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs
 	generate_memdump(machine());
 }
 
-void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, write64_delegate whandler, UINT64 unitmask)
+template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, write64_delegate whandler, UINT64 unitmask)
 {
 	install_read_handler(addrstart, addrend, addrmask, addrmirror, addrselect, rhandler, unitmask);
 	install_write_handler(addrstart, addrend, addrmask, addrmirror, addrselect, whandler, unitmask);
@@ -3187,7 +3207,7 @@ void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, 
 //  install_setoffset_handler - install set_offset delegate handlers for the space
 //-----------------------------------------------------------------------
 
-void address_space::install_setoffset_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, setoffset_delegate handler, UINT64 unitmask)
+template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_setoffset_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, setoffset_delegate handler, UINT64 unitmask)
 {
 	VPRINTF(("address_space::install_setoffset_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
