@@ -2904,6 +2904,7 @@ template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void addr
 
 template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag)
 {
+	fprintf(stderr, "irwp %x %x\n", addrstart, addrend);
 	VPRINTF(("address_space::install_readwrite_port(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 				core_i64_hex_format(addrmirror, m_addrchars),
@@ -2947,6 +2948,7 @@ template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void addr
 
 template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag)
 {
+	fprintf(stderr, "ibg %x %x\n", addrstart, addrend);
 	VPRINTF(("address_space::install_readwrite_bank(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 				core_i64_hex_format(addrmirror, m_addrchars),
@@ -2978,6 +2980,7 @@ template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void addr
 
 template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank)
 {
+	fprintf(stderr, "ibg2 %x %x\n", addrstart, addrend);
 	VPRINTF(("address_space::install_readwrite_bank(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 				core_i64_hex_format(addrmirror, m_addrchars),
@@ -3010,6 +3013,7 @@ template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void addr
 
 template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, void *baseptr)
 {
+	fprintf(stderr, "iram %x %x\n", addrstart, addrend);
 	VPRINTF(("address_space::install_ram_generic(%s-%s mirror=%s, %s, %p)\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 				core_i64_hex_format(addrmirror, m_addrchars),
@@ -3086,6 +3090,7 @@ template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void addr
 
 template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate handler, UINT64 unitmask)
 {
+	fprintf(stderr, "irh8 %x %x\n", addrstart, addrend);
 	VPRINTF(("address_space::install_read_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 				core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
@@ -3100,6 +3105,7 @@ template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void addr
 
 template<int _width_, int _ashift_, endianness_t _Endian, bool _Large> void address_space_specific<_width_, _ashift_, _Endian, _Large>::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8_delegate handler, UINT64 unitmask)
 {
+	fprintf(stderr, "iwh8 %x %x\n", addrstart, addrend);
 	VPRINTF(("address_space::install_write_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 				core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
